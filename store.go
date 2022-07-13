@@ -8,7 +8,6 @@ import (
 	block "github.com/ipfs/go-block-format"
 	cid "github.com/ipfs/go-cid"
 	mh "github.com/multiformats/go-multihash"
-	recbor "github.com/polydawn/refmt/cbor"
 	atlas "github.com/polydawn/refmt/obj/atlas"
 	cbg "github.com/whyrusleeping/cbor-gen"
 )
@@ -75,12 +74,7 @@ func (s *BasicIpldStore) decode(b []byte, out interface{}) error {
 		}
 		return nil
 	}
-
-	if s.Atlas == nil {
-		return DecodeInto(b, out)
-	} else {
-		return recbor.UnmarshalAtlased(recbor.DecodeOptions{}, b, out, *s.Atlas)
-	}
+	panic("should never come here")
 }
 
 type cidProvider interface {
@@ -137,21 +131,7 @@ func (s *BasicIpldStore) Put(ctx context.Context, v interface{}) (cid.Cid, error
 		return blkCid, nil
 	}
 
-	nd, err := WrapObject(v, mhType, mhLen)
-	if err != nil {
-		return cid.Undef, err
-	}
-
-	if err := s.Blocks.Put(ctx, nd); err != nil {
-		return cid.Undef, err
-	}
-
-	ndCid := nd.Cid()
-	if expCid != cid.Undef && ndCid != expCid {
-		return cid.Undef, fmt.Errorf("your object is not being serialized the way it expects to")
-	}
-
-	return ndCid, nil
+	return cid.Undef, fmt.Errorf("unsupport get object through reflect in fvm, tinygo unable to build it")
 }
 
 func NewSerializationError(err error) error {
